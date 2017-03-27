@@ -5,6 +5,14 @@ var util = require('util');
 
 var gmail = google.gmail('v1');
 
+var OAuth2Client = google.auth.OAuth2;
+
+var CLIENT_ID ='60424467687-tspm1lnu1quk7kd4svvufj3rusbq2c6t.apps.googleusercontent.com';
+var CLIENT_SECRET = '2-Mp4UjgpQqel9bzxk5dDyiU';
+
+//var CLIENT_REDIRECT = "https://layla.amazon.com/api/skill/link/MBYKUSTHWH1E2"
+var oauth2Client = new OAuth2Client(CLIENT_ID, CLIENT_SECRET);
+
 var accessToken="";
 var welcomeMessage = "Welcome to Gmail.";
 var repeatWelcomeMessage = "Welcome to Gmail.";
@@ -21,20 +29,23 @@ var Handler = {
 		accessToken = this.event.session.user.accessToken;
 	
 		if(accessToken) {
-			this.emit(':tell',welcomeMessage, repeatWelcomeMessage);
+			//this.emit(':tell',welcomeMessage, repeatWelcomeMessage);
 
-			console.log(gmail.users.getProfile({
-				userId: 'me'
-			}, function(err, profile){
-				if(err)
-				{
-					console.log('An error occured in gmail stuff: ', err);
-				}
-				else
-				{
-					console.log(profile.emailAddress);
-				}
-			}));
+
+			//following block is format for a call, set json parameters
+			//have function callback upon completion of request
+			oauth2Client.setCredentials({access_token: accessToken});
+
+			gmail.users.messages.list({
+				userId: 'me',
+				auth: oauth2Client,
+				maxResults: 3,
+				q: 'is:unread'
+			}, function(err, response){
+				console.log("error... : ", err);
+				console.log("response...: ", response);
+				//this.emit(':tell','are we even here');
+			});
 			
 		}
 		else
@@ -93,4 +104,3 @@ exports.handler = function(event, context, callback) {
 	alexa.registerHandlers(Handler);
 	alexa.execute();
 }
-
