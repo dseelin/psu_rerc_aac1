@@ -55,13 +55,12 @@ var Handler = {
 		
 	},
 	'GetUnreadEmailCount': function(){
-		var gmail = google.gmail('v1');
   		gmail.users.labels.list({
     	auth: oauth2Client,
-    	userId: 'me',
+    	userId: 'me'
   		}, function(err, response) {
     	if (err) {
-      		console.log('The API returned an error: ' + err);
+      		console.log('The API returned an error: ', err);
       		return;
     	}
     	var labels = response.labels;
